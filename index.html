@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EF Project Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F4EF;
+  --ink: #1A1915;
+  --ink-mid: #4A4740;
+  --ink-light: #8A8780;
+  --border: #E2DDD6;
+  --white: #FFFFFF;
+  --cd: #1D6FA4;     --cd-tint: #EAF3FA;
+  --mkt: #7C3D9E;    --mkt-tint: #F4EEF9;
+  --ops: #C05621;    --ops-tint: #FDF0E8;
+  --eoa: #1D9E75;    --eoa-tint: #E8F7F2;
+  --ev: #8B5E3C;     --ev-tint: #F7F0E8;
+  --red: #DC2626; --amber: #D97706; --green: #1D9E75;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+/* ── TOP BAR ── */
+.topbar { background: var(--ink); color: var(--cream); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+.topbar-title { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.3px; }
+.topbar-title em { font-style: italic; opacity: 0.6; }
+.topbar-meta { font-size: 12px; opacity: 0.5; letter-spacing: 0.5px; text-transform: uppercase; }
+.view-toggle { display: flex; gap: 4px; }
+.view-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.6); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; }
+.view-btn.active { background: var(--cream); color: var(--ink); border-color: var(--cream); font-weight: 600; }
+.view-btn:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+
+/* ── HEALTH CARDS ── */
+.health-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 24px 32px 0; }
+.hcard { background: var(--white); border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+.hcard-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); margin-bottom: 8px; }
+.hcard-value { font-family: 'Instrument Serif', serif; font-size: 36px; line-height: 1; margin-bottom: 4px; color: var(--ink); }
+.hcard-sub { font-size: 12px; color: var(--ink-mid); margin-bottom: 12px; }
+.hcard-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.hcard-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+.moving-list { margin-top: 6px; }
+.moving-item { font-size: 12px; color: var(--green); padding: 2px 0; }
+
+/* ── MAIN CONTENT ── */
+.main { padding: 24px 32px 40px; }
+
+/* ── ELT VIEW ── */
+.elt-header { margin-bottom: 20px; }
+.elt-header h2 { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: var(--ink); }
+.elt-header p { font-size: 13px; color: var(--ink-light); margin-top: 4px; }
+
+.elt-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.elt-tab { padding: 7px 18px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--ink-mid); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.elt-tab.active { background: var(--ink); color: var(--cream); border-color: var(--ink); font-weight: 500; }
+
+.elt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.elt-card { background: var(--white); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; transition: box-shadow 0.2s; }
+.elt-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.elt-card-stripe { height: 4px; }
+.elt-card-body { padding: 20px; }
+.elt-card-team { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 6px; }
+.elt-card-goal { font-size: 14px; color: var(--ink); font-weight: 500; margin-bottom: 16px; line-height: 1.4; }
+.elt-milestones { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.elt-mile { display: flex; gap: 10px; align-items: flex-start; }
+.elt-mile-phase { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; min-width: 52px; text-align: center; margin-top: 1px; }
+.elt-mile-text { font-size: 12px; color: var(--ink-mid); line-height: 1.4; }
+.elt-progress { margin-top: 14px; }
+.elt-progress-label { font-size: 11px; color: var(--ink-light); margin-bottom: 5px; display: flex; justify-content: space-between; }
+.elt-progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.elt-progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+/* Directors sub-section */
+.elt-directors { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+.elt-directors-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); margin-bottom: 10px; font-weight: 600; }
+.elt-action-items { display: flex; flex-direction: column; gap: 6px; }
+.elt-action { display: flex; gap: 8px; align-items: flex-start; }
+.elt-action-month { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 7px; border-radius: 8px; background: var(--cream); color: var(--ink-mid); white-space: nowrap; min-width: 42px; text-align: center; margin-top: 1px; }
+.elt-action-text { font-size: 12px; color: var(--ink); line-height: 1.4; }
+.elt-action-owners { font-size: 11px; color: var(--ink-light); margin-top: 1px; }
+
+/* ── DIRECTOR VIEW ── */
+.dir-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
+.filter-group { display: flex; gap: 6px; }
+.filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); color: var(--ink-mid); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+.filter-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+.add-btn { margin-left: auto; padding: 8px 18px; border-radius: 20px; border: none; background: var(--ink); color: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
+.add-btn:hover { opacity: 0.8; }
+
+.month-section { margin-bottom: 32px; }
+.month-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.month-label { font-family: 'Instrument Serif', serif; font-size: 20px; font-weight: 400; color: var(--ink); }
+.month-done-badge { font-size: 11px; padding: 2px 10px; border-radius: 10px; background: var(--cream); color: var(--ink-light); border: 1px solid var(--border); }
+
+.task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.task-card { background: var(--white); border-radius: 10px; border: 1px solid var(--border); padding: 14px 16px; transition: box-shadow 0.2s, opacity 0.2s; cursor: pointer; }
+.task-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+.task-card.done { opacity: 0.55; }
+.task-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.task-check { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; cursor: pointer; }
+.task-check.checked { background: var(--green); border-color: var(--green); }
+.task-check.checked::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+.task-name { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.3; flex: 1; }
+.task-name.done-text { text-decoration: line-through; color: var(--ink-light); }
+.task-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 500; letter-spacing: 0.2px; }
+.badge-team-cd { background: var(--cd-tint); color: var(--cd); }
+.badge-team-mkt { background: var(--mkt-tint); color: var(--mkt); }
+.badge-team-ops { background: var(--ops-tint); color: var(--ops); }
+.badge-team-eoa { background: var(--eoa-tint); color: var(--eoa); }
+.badge-team-ev { background: var(--ev-tint); color: var(--ev); }
+.badge-team-other { background: var(--cream); color: var(--ink-mid); }
+.badge-pri-critical { background: #FEE2E2; color: #991B1B; }
+.badge-pri-high { background: #FEF3C7; color: #92400E; }
+.badge-pri-medium { background: #EDE9FE; color: #5B21B6; }
+.badge-pri-planned { background: #F0F9FF; color: #075985; }
+.badge-pri-done { background: #DCFCE7; color: #166534; }
+.task-detail { font-size: 12px; color: var(--ink-light); margin-top: 6px; line-height: 1.4; }
+.task-initiative { font-size: 11px; color: var(--ink-light); margin-top: 5px; font-style: italic; }
+.task-actions { display: flex; gap: 8px; margin-top: 8px; opacity: 0; transition: opacity 0.15s; }
+.task-card:hover .task-actions { opacity: 1; }
+.task-act-btn { font-size: 11px; color: var(--ink-light); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; }
+.task-act-btn:hover { color: var(--ink); }
+
+/* ── MODAL ── */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--white); border-radius: 16px; padding: 28px; width: 480px; max-width: 95vw; animation: slideUp 0.2s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.modal h3 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; margin-bottom: 20px; }
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 12px; font-weight: 500; color: var(--ink-mid); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--cream); transition: all 0.15s; }
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--ink); background: var(--white); }
+.form-row textarea { resize: vertical; min-height: 70px; }
+.form-row select { appearance: none; cursor: pointer; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.btn-cancel { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--ink-mid); }
+.btn-save { padding: 9px 20px; border-radius: 8px; border: none; background: var(--ink); color: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+
+/* ── SYNC INDICATOR ── */
+.sync-indicator { font-size: 11px; letter-spacing: 0.3px; transition: opacity 0.3s; }
+.sync-saved, .sync-synced { color: #1D9E75; }
+.sync-error { color: #DC2626; }
+.sync-saving { color: var(--ink-light); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">EF Project Dashboard <em>2026</em></div>
+  <div class="view-toggle">
+    <button class="view-btn" id="btn-elt" onclick="setView('elt')">ELT View</button>
+    <button class="view-btn" id="btn-dir" onclick="setView('director')">Director View</button>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><div class="topbar-meta">Echelon Front · 2026</div><div id="sync-indicator" class="sync-indicator" style="color:rgba(255,255,255,0.4)">Loading…</div></div>
+</div>
+
+<div id="health-row" class="health-row"></div>
+<div class="main" id="main-content"></div>
+<div id="modal-root"></div>
+
+<script>
+const MONTHS = ['May','June','July','August','September','October','November','December','Q1 2027','Q4'];
+const TEAM_OPTIONS = ['Client Development','Marketing','Operations/Marketing','EOA','Events/Ops','Other'];
+const PRIORITY_OPTIONS = ['Critical','High','Medium','Planned','Done'];
+const STORAGE_KEY = 'ef-tasks-v1';
+const META_KEY = 'ef-meta-v1';
+
+const DEFAULT_TASKS = [
+  // ── CLIENT DEVELOPMENT ──
+  {id:'t1', month:'May', team:'Client Development', initiative:'Sales Hire', name:'Post JD — sales rep with experience', detail:'Post position. Target mid-June decision, July 1 start.', owner:'CD', priority:'Critical', done:false},
+  {id:'t2', month:'May', team:'Client Development', initiative:'Sales Hire', name:'Evaluate SPIN Selling trainer', detail:'Review pricing, scope, and fit. Decision needed before June commitment.', owner:'CD + Leadership', priority:'High', done:false},
+  {id:'t3', month:'May', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Build sandbox environment', detail:'Stand up sandbox. Configure Record Type Opportunity and Service Objects for Account Management.', owner:'Client Dev', priority:'Critical', done:false},
+  {id:'t4', month:'May', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Internal team + ops testing', detail:'Internal team and ops staff test sandbox. Identify issues, document feedback, implement fixes before data migration.', owner:'Client Dev · Ops', priority:'Critical', done:false},
+  {id:'t5', month:'June', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Transition Tier 3 + Tier 4 account data', detail:'Migrate client data from Tier 3 and Tier 4 accounts into HELIX. Clean and map records during transfer.', owner:'Client Dev', priority:'Critical', done:false},
+  {id:'t6', month:'July', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Test migrated data + production validation', detail:'Full testing of Tier 3 + Tier 4 migrated data in production environment. Resolve any data integrity issues.', owner:'Client Dev · Ops', priority:'Critical', done:false},
+  {id:'t7', month:'August', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Add + train instructors', detail:'Onboard instructors into HELIX. Train on platform navigation, account access, and workflows.', owner:'Client Dev', priority:'Critical', done:false},
+  {id:'t8', month:'May', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: kickoff', detail:'Define survey structure and SOP framework.', owner:'Client Dev · Client Success · LDAP', priority:'High', done:false},
+  {id:'t9', month:'June', team:'Client Development', initiative:'Sales Hire', name:'Sales rep interviews + selection', detail:'Interviews. Target mid-June decision. Start July 1.', owner:'CD + Leadership', priority:'Critical', done:false},
+  {id:'t11', month:'June', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: rollout', detail:'Survey deployment and SOP documentation.', owner:'Client Dev · Client Success · LDAP', priority:'High', done:false},
+  {id:'t12', month:'July', team:'Client Development', initiative:'Sales Hire', name:'New sales rep onboarding — Q3 start', detail:'Ramp on EF products, ICP, HELIX (now in Production), and pipeline. Should be carrying load by August.', owner:'CD', priority:'High', done:false},
+  {id:'t13', month:'August', team:'Client Development', initiative:'Account Management', name:'Case study ROI refinement — ongoing', detail:'Qualitative + quantitative metrics. Show concrete ROI in case studies.', owner:'CD', priority:'High', done:false},
+  // ── MARKETING ──
+  {id:'t14', month:'May', team:'Marketing', initiative:'Account Management', name:'Landing page updates — LDAP/Account Mgmt page', detail:'New information and layout/design on landing page. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
+  {id:'t15', month:'May', team:'Marketing', initiative:'Account Management', name:'Services pages — leadership levels + problems we solve', detail:'Add sections for common leadership levels and problems we solve. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
+  {id:'t16', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Energy/Oil & Gas — launch', detail:'Email + paid + organic. PAS framework. ROI angle. Launch June 1.', owner:'Marketing', priority:'High', done:false},
+  {id:'t17', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Construction launch', detail:'Rework cost + margin erosion messaging. Launch June 1.', owner:'Marketing', priority:'High', done:false},
+  {id:'t18', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Manufacturing', detail:'Quality control + leadership systems. Launch June 1.', owner:'Marketing', priority:'Medium', done:false},
+  {id:'t19', month:'Q4', team:'Marketing', initiative:'Website', name:'Website rebuild — target Jan 1 launch', detail:'Full rebuild. Incorporate new industry pages, case studies, updated brand.', owner:'Marketing + Website', priority:'High', done:false},
+  {id:'t20', month:'November', team:'Marketing', initiative:'Black Friday', name:'Black Friday push', detail:'EOA products, promotions. Coordinate with EOA on offer.', owner:'Marketing', priority:'Medium', done:false},
+  {id:'t21', month:'November', team:'Marketing', initiative:'EOA Academy', name:'Micro-courses launch', detail:'Coordinate with EOA on timing and offer structure.', owner:'Marketing + EOA', priority:'Planned', done:false},
+  // ── OPERATIONS / MARKETING ──
+  {id:'t22', month:'May', team:'Operations/Marketing', initiative:'Workshop Pilot', name:'Workshop pilot: feasibility decision', detail:'Approve or pause workshop pilot plan based on pipeline and bandwidth.', owner:'Ops + CD + Leadership', priority:'High', done:false},
+  {id:'t23', month:'Q4', team:'Operations/Marketing', initiative:'Workshop Pilot', name:'Workshop pilot planning (if approved)', detail:'Select pilot market, venue, promotion plan. Target Q1 first workshop.', owner:'Marketing + Ops', priority:'Planned', done:false},
+  // ── EOA ──
+  {id:'t24', month:'May', team:'EOA', initiative:'EOA Subscription', name:'EOA tech stack: research phase', detail:'Evaluate platform options. Ongoing through July.', owner:'EOA', priority:'High', done:false},
+  {id:'t25', month:'July', team:'EOA', initiative:'EOA Subscription', name:'Finalize tech stack decision', detail:'Review research, align on platform, confirm build requirements. Finalize by end of July.', owner:'EOA + Leadership', priority:'High', done:false},
+  {id:'t26', month:'July', team:'EOA', initiative:'EO Course Launch', name:'New EO Course: launch planning', detail:'Plan launch of new Extreme Ownership course. Coordinate EOA + Marketing.', owner:'EOA + Marketing', priority:'Planned', done:false},
+  {id:'t27', month:'August', team:'EOA', initiative:'EO Course Launch', name:'New EO Course: live', detail:'Execute EO course launch. Marketing supports with email campaign and organic social.', owner:'EOA + Marketing', priority:'Planned', done:false},
+  {id:'t28', month:'July', team:'EOA', initiative:'EO Course Launch', name:'EO Course on Udemy: prep + upload', detail:'List new EO course on Udemy. Confirm formatting, pricing, listing requirements.', owner:'EOA', priority:'Planned', done:false},
+  {id:'t29', month:'August', team:'EOA', initiative:'EO Course Launch', name:'EO Course on Udemy: live', detail:'Course live on Udemy. Monitor early performance and reviews.', owner:'EOA', priority:'Planned', done:false},
+  {id:'t30', month:'Q1 2027', team:'EOA', initiative:'EOA Academy', name:'Record NTL course', detail:'Recording timeline TBD. Coordinate with production on scheduling.', owner:'EOA', priority:'Planned', done:false},
+  {id:'t31', month:'Q4', team:'EOA', initiative:'EOA Academy', name:'Record micro-courses', detail:'Recording timeline TBD. Scope and number to be confirmed.', owner:'EOA', priority:'Planned', done:false},
+  // ── EVENTS / OPS ──
+  {id:'t32', month:'May', team:'Events/Ops', initiative:'Muster M025', name:'M025: Audit registrants + group outreach', detail:'Tier 1 + 2 reactivation. CD + Marketing + Ops align on group discount push.', owner:'Marketing + CD + Ops', priority:'Critical', done:false},
+  {id:'t33', month:'June', team:'Events/Ops', initiative:'Muster M025', name:'M025: All-channel push — seat count reviews', detail:'Weekly seat count reviews. All-channel push to hit 400. Overflow contingency decision.', owner:'Marketing + CD + Ops', priority:'Critical', done:false},
+  {id:'t34', month:'July', team:'Events/Ops', initiative:'Muster M025', name:'M025 EVENT — July 7', detail:'Execute M025. Capture content + attendee data for M026 campaign.', owner:'Ops', priority:'Critical', done:false},
+  {id:'t35', month:'July', team:'Events/Ops', initiative:'Muster M027', name:'Muster 2027: format decision', detail:'Must decide before announcing 2027 dates for sale in August. 3 Musters required in 2027.', owner:'Leadership + Ops', priority:'High', done:false},
+  {id:'t36', month:'August', team:'Events/Ops', initiative:'Muster M026', name:'M026 campaign launches', detail:'Leverage M025 momentum. Announce M027 dates for sale.', owner:'Marketing + CD + Ops', priority:'High', done:false},
+  {id:'t37', month:'October', team:'Events/Ops', initiative:'Muster M026', name:'M026 EVENT', detail:'Execute M026. Track group vs individual ratio.', owner:'Ops', priority:'High', done:false},
+  {id:'t38', month:'August', team:'Events/Ops', initiative:'Muster M028', name:'M028: horizon planning', detail:'Decision on dates + location needed EOY. Placeholder — 2028 format TBD.', owner:'Leadership + Ops', priority:'Planned', done:false},
+];
+
+const ELT_STREAMS = {
+  directors: [
+    {
+      team: 'Client Development',
+      color: 'var(--cd)', tint: 'var(--cd-tint)',
+      goal: 'Hire sales rep · HELIX Project · Evaluate SPIN Selling · Account Management · Client Survey Data + SOP',
+      milestones: [
+        {phase:'May', text:'Build HELIX sandbox. Internal team + ops testing. Post JD. Evaluate SPIN Selling trainer. Client Survey Data + SOP kickoff.'},
+        {phase:'June', text:'HELIX: Transition Tier 3 + Tier 4 account data. Sales rep interviews + selection (mid-June decision). Client Survey + SOP rollout.'},
+        {phase:'July', text:'HELIX: Test migrated data + production validation. New sales rep starts Q3.'},
+        {phase:'August', text:'HELIX: Add + train instructors. Case study ROI refinement ongoing.'},
+      ],
+      directorItems: [
+        {month:'May', text:'HELIX: Build sandbox + internal team/ops testing', owners:'Client Dev · Ops'},
+        {month:'May', text:'Client Survey Data + SOP — kickoff', owners:'Client Dev · Client Success · LDAP'},
+        {month:'June', text:'HELIX: Transition Tier 3 + Tier 4 account data', owners:'Client Dev'},
+        {month:'June', text:'Client Survey Data + SOP — rollout', owners:'Client Dev · Client Success · LDAP'},
+        {month:'July', text:'HELIX: Test migrated data + production validation', owners:'Client Dev · Ops'},
+        {month:'August', text:'HELIX: Add + train instructors', owners:'Client Dev'},
+      ]
+    },
+    {
+      team: 'Marketing',
+      color: 'var(--mkt)', tint: 'var(--mkt-tint)',
+      goal: 'Industry Campaigns · Account Management pages · Website rebuild · Workshop Pilot',
+      milestones: [
+        {phase:'May', text:'All three industry campaigns in prep: Energy/Oil & Gas, Construction, Manufacturing. Landing page + services page updates. Workshop pilot feasibility decision.'},
+        {phase:'June 1', text:'All industry campaigns go live — Energy/Oil & Gas, Construction, Manufacturing.'},
+        {phase:'Q4', text:'Website rebuild — target Jan 1 launch. Black Friday push. Micro-courses. Workshop pilot planning (if approved).'},
+      ],
+      directorItems: [
+        {month:'May', text:'Landing page updates — Account Mgmt/LDAP page', owners:'Marketing + Website'},
+        {month:'May', text:'Services pages — leadership levels + problems we solve', owners:'Marketing + Website'},
+        {month:'May', text:'Workshop pilot: feasibility decision', owners:'Ops + CD + Leadership'},
+        {month:'June 1', text:'All industry campaigns live — Energy/Oil & Gas, Construction, Manufacturing', owners:'Marketing'},
+        {month:'Q4', text:'Workshop pilot planning (if approved)', owners:'Marketing + Ops'},
+      ]
+    },
+    {
+      team: 'EOA',
+      color: 'var(--eoa)', tint: 'var(--eoa-tint)',
+      goal: 'Tech stack decision · EO Course launch · Udemy · EOA Academy content',
+      milestones: [
+        {phase:'May–July', text:'Tech stack research. Finalize by end of July.'},
+        {phase:'July–Aug', text:'New EO Course launch + on Udemy.'},
+        {phase:'Q4', text:'Record micro-courses.'},
+        {phase:'Q1 2027', text:'Record NTL course.'},
+      ],
+      directorItems: [
+        {month:'July', text:'Finalize tech stack decision', owners:'EOA + Leadership'},
+        {month:'July', text:'EO Course on Udemy: prep + upload', owners:'EOA'},
+        {month:'August', text:'New EO Course: live', owners:'EOA + Marketing'},
+      ]
+    },
+    {
+      team: 'Events/Ops',
+      color: 'var(--ev)', tint: 'var(--ev-tint)',
+      goal: 'Sell out M025 · Execute M026 · Plan M028',
+      milestones: [
+        {phase:'May', text:'Audit M025 registrants. Align CD on group outreach.'},
+        {phase:'June', text:'All-channel push. Weekly seat count reviews.'},
+        {phase:'July 7', text:'M025 EVENT. Capture content + attendee data.'},
+        {phase:'July', text:'Muster 2027 format decision (must precede August sales announcement).'},
+        {phase:'August', text:'M026 campaign launches. Announce M027 dates.'},
+        {phase:'Oct', text:'M026 EVENT. Track group vs individual ratio.'},
+      ],
+      directorItems: [
+        {month:'July', text:'Muster 2027 format decision', owners:'Leadership + Ops'},
+        {month:'August', text:'Announce M027 dates for sale', owners:'Marketing + Ops'},
+        {month:'Aug–Sep', text:'M028 horizon planning — EOY decision needed', owners:'Leadership + Ops'},
+      ]
+    },
+  ]
+};
+
+// ── SHARED PERSISTENT STORAGE ──
+let state = {
+  tasks: DEFAULT_TASKS.map(t=>({...t})),
+  filterTeam: 'All', filterPriority: 'All',
+  view: 'elt', eltTab: 'directors'
+};
+let syncInterval = null;
+let lastSyncedAt = 0;
+let isSaving = false;
+
+async function loadFromStorage() {
+  try {
+    const [tasksResult, metaResult] = await Promise.all([
+      window.storage.get(STORAGE_KEY, true),
+      window.storage.get(META_KEY, true)
+    ]);
+    if (tasksResult && tasksResult.value) {
+      const saved = JSON.parse(tasksResult.value);
+      state.tasks = saved.tasks || state.tasks;
+    }
+    if (metaResult && metaResult.value) {
+      const meta = JSON.parse(metaResult.value);
+      state.view = meta.view || state.view;
+      state.eltTab = meta.eltTab || state.eltTab;
+      state.filterTeam = meta.filterTeam || state.filterTeam;
+      state.filterPriority = meta.filterPriority || state.filterPriority;
+    }
+  } catch(e) {
+    // Storage not available, use defaults
+  }
+  render();
+  startSync();
+}
+
+async function saveToStorage() {
+  if (isSaving) return;
+  isSaving = true;
+  try {
+    await Promise.all([
+      window.storage.set(STORAGE_KEY, JSON.stringify({tasks: state.tasks}), true),
+      window.storage.set(META_KEY, JSON.stringify({
+        view: state.view, eltTab: state.eltTab,
+        filterTeam: state.filterTeam, filterPriority: state.filterPriority
+      }), true)
+    ]);
+    lastSyncedAt = Date.now();
+    updateSyncIndicator('saved');
+  } catch(e) {
+    updateSyncIndicator('error');
+  }
+  isSaving = false;
+}
+
+async function pollForUpdates() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    if (result && result.value) {
+      const saved = JSON.parse(result.value);
+      // Only re-render if tasks changed vs what we have
+      const remoteStr = JSON.stringify(saved.tasks);
+      const localStr = JSON.stringify(state.tasks);
+      if (remoteStr !== localStr) {
+        state.tasks = saved.tasks;
+        render();
+        updateSyncIndicator('synced');
+      }
+    }
+  } catch(e) {}
+}
+
+function startSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(pollForUpdates, 5000);
+}
+
+function updateSyncIndicator(status) {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  const msgs = {saved:'✓ Saved', synced:'↻ Updated', error:'⚠ Sync error', saving:'Saving…'};
+  el.textContent = msgs[status] || '';
+  el.className = 'sync-indicator sync-' + status;
+}
+
+function saveState() {
+  updateSyncIndicator('saving');
+  saveToStorage();
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid() { return 't' + Date.now() + Math.random().toString(36).slice(2,6); }
+
+let showForm = false;
+let editId = null;
+let formData = {};
+
+function setView(v) { state.view = v; saveState(); render(); }
+function setEltTab(t) { state.eltTab = t; saveState(); render(); }
+
+function render() {
+  renderHealth();
+  if (state.view === 'elt') renderElt();
+  else renderDirector();
+  document.getElementById('btn-elt').className = 'view-btn' + (state.view==='elt'?' active':'');
+  document.getElementById('btn-dir').className = 'view-btn' + (state.view==='director'?' active':'');
+}
+
+function teamBadgeClass(team) {
+  if (!team) return 'badge-team-other';
+  const t = team.toLowerCase();
+  if (t.includes('client dev')) return 'badge-team-cd';
+  if (t.includes('marketing')) return 'badge-team-mkt';
+  if (t.includes('operations')) return 'badge-team-ops';
+  if (t.includes('eoa')) return 'badge-team-eoa';
+  if (t.includes('events')) return 'badge-team-ev';
+  return 'badge-team-other';
+}
+
+function priBadgeClass(p) {
+  const map = {Critical:'badge-pri-critical',High:'badge-pri-high',Medium:'badge-pri-medium',Planned:'badge-pri-planned',Done:'badge-pri-done'};
+  return map[p] || 'badge-pri-planned';
+}
+
+function renderHealth() {
+  const allTasks = state.tasks;
+  const totalTasks = allTasks.length;
+  const doneTasks = allTasks.filter(t=>t.done).length;
+  const pctDone = totalTasks ? Math.round((doneTasks/totalTasks)*100) : 0;
+  const currentMonth = 'May';
+  const currentMonthTasks = allTasks.filter(t=>t.month===currentMonth);
+  const movingInitiatives = [...new Set(currentMonthTasks.filter(t=>t.done).map(t=>t.initiative||t.team))];
+  const currentInitiatives = [...new Set(currentMonthTasks.map(t=>t.initiative||t.team))];
+  const stalledInitiatives = currentInitiatives.filter(ini => {
+    const iniTasks = currentMonthTasks.filter(t=>(t.initiative||t.team)===ini);
+    const hasUrgent = iniTasks.some(t=>['Critical','High'].includes(t.priority)&&!t.done);
+    const noDone = iniTasks.every(t=>!t.done);
+    return hasUrgent && noDone;
+  });
+  const barColor = pctDone >= 66 ? '#1D9E75' : pctDone >= 33 ? '#D97706' : '#DC2626';
+  const monthDone = currentMonthTasks.filter(t=>t.done).length;
+  const monthPct = currentMonthTasks.length ? Math.round((monthDone/currentMonthTasks.length)*100) : 0;
+  const monthBarColor = monthPct >= 66 ? '#1D9E75' : monthPct >= 33 ? '#D97706' : '#DC2626';
+  document.getElementById('health-row').innerHTML = `
+    <div class="hcard">
+      <div class="hcard-label">Overall Progress</div>
+      <div class="hcard-value">${pctDone}%</div>
+      <div class="hcard-sub">${doneTasks} of ${totalTasks} tasks complete</div>
+      <div class="hcard-bar"><div class="hcard-bar-fill" style="width:${pctDone}%;background:${barColor}"></div></div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-label">May — This Month</div>
+      <div class="hcard-value">${monthDone} / ${currentMonthTasks.length}</div>
+      <div class="hcard-sub">tasks complete in May</div>
+      <div class="hcard-bar"><div class="hcard-bar-fill" style="width:${monthPct}%;background:${monthBarColor}"></div></div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-label">What's Moving</div>
+      <div class="hcard-value">${movingInitiatives.length}</div>
+      <div class="hcard-sub">initiative${movingInitiatives.length!==1?'s':''} with progress this month</div>
+      <div class="moving-list">${movingInitiatives.slice(0,4).map(i=>`<div class="moving-item">✓ ${esc(i)}</div>`).join('')}${movingInitiatives.length===0?'<div style="font-size:11px;color:#bbb;margin-top:4px">Nothing checked off yet</div>':''}</div>
+    </div>
+    <div class="hcard">
+      <div class="hcard-label">What's Stalled</div>
+      <div class="hcard-value" style="color:${stalledInitiatives.length>0?'#DC2626':'#1D9E75'}">${stalledInitiatives.length}</div>
+      <div class="hcard-sub">high-priority initiative${stalledInitiatives.length!==1?'s':''} not yet started</div>
+      <div class="moving-list">${stalledInitiatives.slice(0,3).map(i=>`<div style="font-size:12px;color:#DC2626;padding:2px 0">⚠ ${esc(i)}</div>`).join('')}${stalledInitiatives.length===0?'<div style="font-size:12px;color:#1D9E75;margin-top:4px">✓ All clear</div>':''}</div>
+    </div>`;
+}
+
+function renderElt() {
+  const streams = ELT_STREAMS[state.eltTab || 'directors'];
+  const allTasks = state.tasks;
+  let html = `<div class="elt-header"><h2>ELT Summary</h2><p>High-level view of all active workstreams</p></div>`;
+  html += `<div class="elt-tabs"><button class="elt-tab ${(state.eltTab||'directors')==='directors'?'active':''}" onclick="setEltTab('directors')">Directors View</button></div>`;
+  html += `<div class="elt-grid">`;
+  streams.forEach(s => {
+    const teamTasks = allTasks.filter(t=>t.team===s.team);
+    const done = teamTasks.filter(t=>t.done).length;
+    const pct = teamTasks.length ? Math.round((done/teamTasks.length)*100) : 0;
+    const barColor = pct >= 66 ? '#1D9E75' : pct >= 33 ? '#D97706' : '#DC2626';
+    html += `<div class="elt-card">
+      <div class="elt-card-stripe" style="background:${s.color}"></div>
+      <div class="elt-card-body">
+        <div class="elt-card-team" style="color:${s.color}">${esc(s.team)}</div>
+        <div class="elt-card-goal">${esc(s.goal)}</div>
+        <div class="elt-milestones">`;
+    s.milestones.forEach(m => {
+      html += `<div class="elt-mile"><div class="elt-mile-phase" style="background:${s.tint};color:${s.color}">${esc(m.phase)}</div><div class="elt-mile-text">${esc(m.text)}</div></div>`;
+    });
+    html += `</div><div class="elt-progress"><div class="elt-progress-label"><span>Progress</span><span>${done}/${teamTasks.length} tasks</span></div><div class="elt-progress-bar"><div class="elt-progress-fill" style="width:${pct}%;background:${barColor}"></div></div></div>`;
+    if (s.directorItems && s.directorItems.length > 0) {
+      html += `<div class="elt-directors"><div class="elt-directors-label">Director Action Items</div><div class="elt-action-items">`;
+      s.directorItems.forEach(item => {
+        html += `<div class="elt-action"><div class="elt-action-month">${esc(item.month)}</div><div><div class="elt-action-text">${esc(item.text)}</div><div class="elt-action-owners">${esc(item.owners)}</div></div></div>`;
+      });
+      html += `</div></div>`;
+    }
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  document.getElementById('main-content').innerHTML = html;
+  document.getElementById('modal-root').innerHTML = '';
+}
+
+function renderDirector() {
+  const allTasks = state.tasks;
+  const filtered = allTasks.filter(t =>
+    (state.filterTeam === 'All' || t.team === state.filterTeam) &&
+    (state.filterPriority === 'All' || t.priority === state.filterPriority)
+  );
+  const monthOrder = ['May','June','July','August','September','October','November','December','Q4','Q1 2027'];
+  const byMonth = {};
+  filtered.forEach(t => { if (!byMonth[t.month]) byMonth[t.month] = []; byMonth[t.month].push(t); });
+  let html = `<div class="dir-toolbar"><div class="filter-group">`;
+  ['All',...TEAM_OPTIONS].forEach(t => {
+    html += `<button class="filter-btn ${state.filterTeam===t?'active':''}" onclick="setFilter('team','${esc(t)}')">${esc(t==='All'?'All Teams':t)}</button>`;
+  });
+  html += `</div><div class="filter-group">`;
+  ['All',...PRIORITY_OPTIONS].forEach(p => {
+    html += `<button class="filter-btn ${state.filterPriority===p?'active':''}" onclick="setFilter('priority','${esc(p)}')">${esc(p==='All'?'All Priority':p)}</button>`;
+  });
+  html += `</div><button class="add-btn" onclick="openForm()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Add Task</button></div>`;
+  monthOrder.forEach(mo => {
+    if (!byMonth[mo]) return;
+    const tasks = byMonth[mo];
+    const done = tasks.filter(t=>t.done).length;
+    html += `<div class="month-section"><div class="month-header"><div class="month-label">${esc(mo)}</div><div class="month-done-badge">${done}/${tasks.length} done</div></div><div class="task-grid">`;
+    tasks.forEach(t => {
+      html += `<div class="task-card ${t.done?'done':''}">
+        <div class="task-top">
+          <div class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></div>
+          <div class="task-name ${t.done?'done-text':''}">${esc(t.name)}</div>
+        </div>
+        <div class="task-meta">
+          <span class="badge ${teamBadgeClass(t.team)}">${esc(t.team)}</span>
+          ${t.priority?`<span class="badge ${priBadgeClass(t.priority)}">${esc(t.priority)}</span>`:''}
+        </div>
+        ${t.owner?`<div class="task-detail">👤 ${esc(t.owner)}</div>`:''}
+        ${t.detail?`<div class="task-detail">${esc(t.detail)}</div>`:''}
+        ${t.initiative?`<div class="task-initiative">${esc(t.initiative)}</div>`:''}
+        <div class="task-actions">
+          <button class="task-act-btn" onclick="openEdit('${t.id}')">Edit</button>
+          <button class="task-act-btn" onclick="deleteTask('${t.id}')">Delete</button>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  document.getElementById('main-content').innerHTML = html;
+  renderModal();
+}
+
+function renderModal() {
+  if (!showForm) { document.getElementById('modal-root').innerHTML = ''; return; }
+  const isEdit = !!editId;
+  const d = formData;
+  document.getElementById('modal-root').innerHTML = `
+    <div class="modal-backdrop" onclick="closeForm()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3>${isEdit?'Edit Task':'Add Task'}</h3>
+        <div class="form-row"><label>Task Name</label><input id="f-name" value="${esc(d.name||'')}"></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Month</label><select id="f-month">${MONTHS.map(m=>`<option value="${m}" ${d.month===m?'selected':''}>${m}</option>`).join('')}</select></div>
+          <div class="form-row"><label>Team</label><select id="f-team">${TEAM_OPTIONS.map(t=>`<option value="${t}" ${d.team===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row"><label>Initiative</label><input id="f-initiative" value="${esc(d.initiative||'')}"></div>
+          <div class="form-row"><label>Priority</label><select id="f-priority">${PRIORITY_OPTIONS.map(p=>`<option value="${p}" ${d.priority===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-row"><label>Owner(s)</label><input id="f-owner" value="${esc(d.owner||'')}"></div>
+        <div class="form-row"><label>Detail</label><textarea id="f-detail">${esc(d.detail||'')}</textarea></div>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeForm()">Cancel</button>
+          <button class="btn-save" onclick="saveForm()">Save</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function setFilter(type, val) {
+  if (type==='team') state.filterTeam = val;
+  else state.filterPriority = val;
+  saveState(); render();
+}
+
+function openForm() {
+  showForm = true; editId = null;
+  formData = { month:'May', team:'Client Development', priority:'High', name:'', detail:'', owner:'', initiative:'' };
+  renderDirector();
+}
+
+function openEdit(id) {
+  const t = state.tasks.find(x=>x.id===id);
+  if (!t) return;
+  showForm = true; editId = id; formData = {...t};
+  renderDirector();
+}
+
+function closeForm() { showForm = false; editId = null; renderDirector(); }
+
+function saveForm() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Task name required.'); return; }
+  formData = {
+    name,
+    month: document.getElementById('f-month').value,
+    team: document.getElementById('f-team').value,
+    initiative: document.getElementById('f-initiative').value.trim(),
+    priority: document.getElementById('f-priority').value,
+    owner: document.getElementById('f-owner').value.trim(),
+    detail: document.getElementById('f-detail').value.trim(),
+  };
+  if (editId) {
+    const idx = state.tasks.findIndex(x=>x.id===editId);
+    if (idx > -1) state.tasks[idx] = {...state.tasks[idx], ...formData};
+  } else {
+    state.tasks.push({id:uid(), ...formData, done:false});
+  }
+  showForm = false; editId = null;
+  saveState(); render();
+}
+
+function toggleDone(id) {
+  const t = state.tasks.find(x=>x.id===id);
+  if (t) { t.done = !t.done; if(t.done) t.priority='Done'; }
+  saveState(); render();
+}
+
+function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  state.tasks = state.tasks.filter(x=>x.id!==id);
+  saveState(); render();
+}
+
+// Init — load from shared storage first
+loadFromStorage();
+</script>
+</body>
+</html>

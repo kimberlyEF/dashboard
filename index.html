@@ -18,6 +18,7 @@
   --ops: #C05621;    --ops-tint: #FDF0E8;
   --eoa: #1D9E75;    --eoa-tint: #E8F7F2;
   --ev: #8B5E3C;     --ev-tint: #F7F0E8;
+  --ldap: #2D6A4F;   --ldap-tint: #D8F3DC;
   --red: #DC2626; --amber: #D97706; --green: #1D9E75;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -111,6 +112,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .badge-team-ops { background: var(--ops-tint); color: var(--ops); }
 .badge-team-eoa { background: var(--eoa-tint); color: var(--eoa); }
 .badge-team-ev { background: var(--ev-tint); color: var(--ev); }
+.badge-team-ldap { background: var(--ldap-tint); color: var(--ldap); }
 .badge-team-other { background: var(--cream); color: var(--ink-mid); }
 .badge-pri-critical { background: #FEE2E2; color: #991B1B; }
 .badge-pri-high { background: #FEF3C7; color: #92400E; }
@@ -164,10 +166,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
 <script>
 const MONTHS = ['May','June','July','August','September','October','November','December','Q1 2027','Q4'];
-const TEAM_OPTIONS = ['Client Development','Marketing','Operations/Marketing','EOA','Events/Ops','Other'];
+const TEAM_OPTIONS = ['Client Development','LDAP/Client Alignment Team','Events/Ops','Marketing/Media','EOA','Operations/Marketing','Other'];
 const PRIORITY_OPTIONS = ['Critical','High','Medium','Planned','Done'];
-const STORAGE_KEY = 'ef-tasks-v1';
-const META_KEY = 'ef-meta-v1';
+const STORAGE_KEY = 'ef-tasks-v6';
+const META_KEY = 'ef-meta-v6';
 
 const DEFAULT_TASKS = [
   // ── CLIENT DEVELOPMENT ──
@@ -175,29 +177,36 @@ const DEFAULT_TASKS = [
   {id:'t2', month:'May', team:'Client Development', initiative:'Sales Hire', name:'Evaluate SPIN Selling trainer', detail:'Review pricing, scope, and fit. Decision needed before June commitment.', owner:'CD + Leadership', priority:'High', done:false},
   {id:'t3', month:'May', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Build sandbox environment', detail:'Stand up sandbox. Configure Record Type Opportunity and Service Objects for Account Management.', owner:'Client Dev', priority:'Critical', done:false},
   {id:'t4', month:'May', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Internal team + ops testing', detail:'Internal team and ops staff test sandbox. Identify issues, document feedback, implement fixes before data migration.', owner:'Client Dev · Ops', priority:'Critical', done:false},
-  {id:'t5', month:'June', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Transition Tier 3 + Tier 4 account data', detail:'Migrate client data from Tier 3 and Tier 4 accounts into HELIX. Clean and map records during transfer.', owner:'Client Dev', priority:'Critical', done:false},
-  {id:'t6', month:'July', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Test migrated data + production validation', detail:'Full testing of Tier 3 + Tier 4 migrated data in production environment. Resolve any data integrity issues.', owner:'Client Dev · Ops', priority:'Critical', done:false},
-  {id:'t7', month:'August', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Add + train instructors', detail:'Onboard instructors into HELIX. Train on platform navigation, account access, and workflows.', owner:'Client Dev', priority:'Critical', done:false},
-  {id:'t8', month:'May', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: kickoff', detail:'Define survey structure and SOP framework.', owner:'Client Dev · Client Success · LDAP', priority:'High', done:false},
+  {id:'t5', month:'June', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Transition Tier 3 + Tier 4 account data', detail:'Migrate client data from Tier 3 and Tier 4 accounts into HELIX. Clean and map records during transfer. LDAP/Client Alignment Team team validates migrated data.', owner:'Client Dev · LDAP/Client Alignment Team', priority:'Critical', done:false},
+  {id:'t6', month:'July', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Testing + full client reporting live — July 31', detail:'Full testing of migrated data. LDAP/Client Alignment Team team running reports and managing accounts through HELIX. All client reporting functional by July 31.', owner:'Client Dev · LDAP/Client Alignment Team · Ops', priority:'Critical', done:false},
+  {id:'t7', month:'August', team:'Client Development', initiative:'HELIX Project', name:'HELIX: Instructor testing + full setup', detail:'LDAP/Client Alignment Team team leads instructor testing. Confirm instructor access, permissions, and workflows fully configured. Final sign-off on platform readiness.', owner:'Client Dev · LDAP/Client Alignment Team', priority:'Critical', done:false},
+  {id:'t8', month:'May', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: kickoff', detail:'Define survey structure and SOP framework.', owner:'Client Dev · Client Success · LDAP/Client Alignment Team', priority:'High', done:false},
   {id:'t9', month:'June', team:'Client Development', initiative:'Sales Hire', name:'Sales rep interviews + selection', detail:'Interviews. Target mid-June decision. Start July 1.', owner:'CD + Leadership', priority:'Critical', done:false},
-  {id:'t11', month:'June', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: rollout', detail:'Survey deployment and SOP documentation.', owner:'Client Dev · Client Success · LDAP', priority:'High', done:false},
+  {id:'t11', month:'June', team:'Client Development', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: rollout', detail:'Survey deployment and SOP documentation.', owner:'Client Dev · Client Success · LDAP/Client Alignment Team', priority:'High', done:false},
   {id:'t12', month:'July', team:'Client Development', initiative:'Sales Hire', name:'New sales rep onboarding — Q3 start', detail:'Ramp on EF products, ICP, HELIX (now in Production), and pipeline. Should be carrying load by August.', owner:'CD', priority:'High', done:false},
-  {id:'t13', month:'August', team:'Client Development', initiative:'Account Management', name:'Case study ROI refinement — ongoing', detail:'Qualitative + quantitative metrics. Show concrete ROI in case studies.', owner:'CD', priority:'High', done:false},
+  {id:'t13', month:'August', team:'LDAP/Client Alignment Team', initiative:'Account Management', name:'Case study ROI refinement — ongoing', detail:'Qualitative + quantitative metrics. Show concrete ROI in case studies.', owner:'LDAP/Client Alignment Team', priority:'High', done:false},
+  // ── LDAP/Client Alignment Team / ACCOUNT MANAGEMENT ──
+  {id:'tL1', month:'May', team:'LDAP/Client Alignment Team', initiative:'HELIX Project', name:'HELIX: Sandbox access + initial orientation', detail:'LDAP/Client Alignment Team team granted sandbox access. Initial orientation on new system structure and record types.', owner:'LDAP/Client Alignment Team · Client Dev', priority:'Critical', done:false},
+  {id:'tL2', month:'June', team:'LDAP/Client Alignment Team', initiative:'HELIX Project', name:'HELIX: Review + validate Tier 3 + Tier 4 data migration', detail:'LDAP/Client Alignment Team team reviews migrated client account data. Flag discrepancies, confirm record accuracy for their accounts.', owner:'LDAP/Client Alignment Team · Client Dev', priority:'Critical', done:false},
+  {id:'tL3', month:'July', team:'LDAP/Client Alignment Team', initiative:'HELIX Project', name:'HELIX: Full client reporting live — July 31', detail:'All client reporting functional in HELIX by July 31. LDAP/Client Alignment Team team running reports and managing accounts through platform.', owner:'LDAP/Client Alignment Team', priority:'Critical', done:false},
+  {id:'tL4', month:'August', team:'LDAP/Client Alignment Team', initiative:'HELIX Project', name:'HELIX: Instructor testing + full setup', detail:'LDAP/Client Alignment Team team leads instructor testing. Confirm instructor access, permissions, and workflows are fully configured.', owner:'LDAP/Client Alignment Team · Client Dev', priority:'Critical', done:false},
+  {id:'tL5', month:'May', team:'LDAP/Client Alignment Team', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: kickoff', detail:'Join kickoff with Client Dev and Client Success. Define LDAP/Client Alignment Team-specific survey questions and SOP touchpoints.', owner:'LDAP/Client Alignment Team · Client Dev · Client Success', priority:'High', done:false},
+  {id:'tL6', month:'June', team:'LDAP/Client Alignment Team', initiative:'Client Survey Data + SOP', name:'Client Survey Data + SOP: rollout', detail:'Execute survey with LDAP/Client Alignment Team accounts. Apply SOP framework to account management workflows.', owner:'LDAP/Client Alignment Team · Client Dev · Client Success', priority:'High', done:false},
   // ── MARKETING ──
-  {id:'t14', month:'May', team:'Marketing', initiative:'Account Management', name:'Landing page updates — LDAP/Account Mgmt page', detail:'New information and layout/design on landing page. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
-  {id:'t15', month:'May', team:'Marketing', initiative:'Account Management', name:'Services pages — leadership levels + problems we solve', detail:'Add sections for common leadership levels and problems we solve. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
-  {id:'t16', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Energy/Oil & Gas — launch', detail:'Email + paid + organic. PAS framework. ROI angle. Launch June 1.', owner:'Marketing', priority:'High', done:false},
-  {id:'t17', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Construction launch', detail:'Rework cost + margin erosion messaging. Launch June 1.', owner:'Marketing', priority:'High', done:false},
-  {id:'t18', month:'May', team:'Marketing', initiative:'Industry Campaign', name:'Industry campaign: Manufacturing', detail:'Quality control + leadership systems. Launch June 1.', owner:'Marketing', priority:'Medium', done:false},
-  {id:'t19', month:'Q4', team:'Marketing', initiative:'Website', name:'Website rebuild — target Jan 1 launch', detail:'Full rebuild. Incorporate new industry pages, case studies, updated brand.', owner:'Marketing + Website', priority:'High', done:false},
-  {id:'t20', month:'November', team:'Marketing', initiative:'Black Friday', name:'Black Friday push', detail:'EOA products, promotions. Coordinate with EOA on offer.', owner:'Marketing', priority:'Medium', done:false},
-  {id:'t21', month:'November', team:'Marketing', initiative:'EOA Academy', name:'Micro-courses launch', detail:'Coordinate with EOA on timing and offer structure.', owner:'Marketing + EOA', priority:'Planned', done:false},
+  {id:'t14', month:'May', team:'Marketing/Media', initiative:'Account Management', name:'Landing page updates — LDAP/Client Alignment Team/Account Mgmt page', detail:'New information and layout/design on landing page. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
+  {id:'t15', month:'May', team:'Marketing/Media', initiative:'Account Management', name:'Services pages — leadership levels + problems we solve', detail:'Add sections for common leadership levels and problems we solve. Due June 1.', owner:'Marketing + Website', priority:'Medium', done:false},
+  {id:'t16', month:'May', team:'Marketing/Media', initiative:'Industry Campaign', name:'Industry campaign: Energy/Oil & Gas — launch', detail:'Email + paid + organic. PAS framework. ROI angle. Launch June 1.', owner:'Marketing/Media', priority:'High', done:false},
+  {id:'t17', month:'May', team:'Marketing/Media', initiative:'Industry Campaign', name:'Industry campaign: Construction launch', detail:'Rework cost + margin erosion messaging. Launch June 1.', owner:'Marketing/Media', priority:'High', done:false},
+  {id:'t18', month:'May', team:'Marketing/Media', initiative:'Industry Campaign', name:'Industry campaign: Manufacturing', detail:'Quality control + leadership systems. Launch June 1.', owner:'Marketing/Media', priority:'Medium', done:false},
+  {id:'t19', month:'Q4', team:'Marketing/Media', initiative:'Website', name:'Website rebuild — target Jan 1 launch', detail:'Full rebuild. Incorporate new industry pages, case studies, updated brand.', owner:'Marketing + Website', priority:'High', done:false},
+  {id:'t20', month:'November', team:'Marketing/Media', initiative:'Black Friday', name:'Black Friday push', detail:'EOA products, promotions. Coordinate with EOA on offer.', owner:'Marketing/Media', priority:'Medium', done:false},
+  {id:'t21', month:'November', team:'Marketing/Media', initiative:'EOA Academy', name:'Micro-courses launch', detail:'Coordinate with EOA on timing and offer structure.', owner:'Marketing + EOA', priority:'Planned', done:false},
   // ── OPERATIONS / MARKETING ──
   {id:'t22', month:'May', team:'Operations/Marketing', initiative:'Workshop Pilot', name:'Workshop pilot: feasibility decision', detail:'Approve or pause workshop pilot plan based on pipeline and bandwidth.', owner:'Ops + CD + Leadership', priority:'High', done:false},
   {id:'t23', month:'Q4', team:'Operations/Marketing', initiative:'Workshop Pilot', name:'Workshop pilot planning (if approved)', detail:'Select pilot market, venue, promotion plan. Target Q1 first workshop.', owner:'Marketing + Ops', priority:'Planned', done:false},
   // ── EOA ──
   {id:'t24', month:'May', team:'EOA', initiative:'EOA Subscription', name:'EOA tech stack: research phase', detail:'Evaluate platform options. Ongoing through July.', owner:'EOA', priority:'High', done:false},
-  {id:'t25', month:'July', team:'EOA', initiative:'EOA Subscription', name:'Finalize tech stack decision', detail:'Review research, align on platform, confirm build requirements. Finalize by end of July.', owner:'EOA + Leadership', priority:'High', done:false},
+  {id:'t25', month:'May', team:'EOA', initiative:'EOA Subscription', name:'Finalize tech stack decision', detail:'Review research, align on platform, confirm build requirements. Finalize by end of May.', owner:'EOA + Leadership', priority:'High', done:false},
   {id:'t26', month:'July', team:'EOA', initiative:'EO Course Launch', name:'New EO Course: launch planning', detail:'Plan launch of new Extreme Ownership course. Coordinate EOA + Marketing.', owner:'EOA + Marketing', priority:'Planned', done:false},
   {id:'t27', month:'August', team:'EOA', initiative:'EO Course Launch', name:'New EO Course: live', detail:'Execute EO course launch. Marketing supports with email campaign and organic social.', owner:'EOA + Marketing', priority:'Planned', done:false},
   {id:'t28', month:'July', team:'EOA', initiative:'EO Course Launch', name:'EO Course on Udemy: prep + upload', detail:'List new EO course on Udemy. Confirm formatting, pricing, listing requirements.', owner:'EOA', priority:'Planned', done:false},
@@ -205,11 +214,12 @@ const DEFAULT_TASKS = [
   {id:'t30', month:'Q1 2027', team:'EOA', initiative:'EOA Academy', name:'Record NTL course', detail:'Recording timeline TBD. Coordinate with production on scheduling.', owner:'EOA', priority:'Planned', done:false},
   {id:'t31', month:'Q4', team:'EOA', initiative:'EOA Academy', name:'Record micro-courses', detail:'Recording timeline TBD. Scope and number to be confirmed.', owner:'EOA', priority:'Planned', done:false},
   // ── EVENTS / OPS ──
+  {id:'tW1', month:'May', team:'Events/Ops', initiative:'Workshop Pilot', name:'Workshop pilot: proposal + feasibility', detail:'Build out workshop proposal. Evaluate format, market, pricing, and logistics. Feasibility decision by end of May.', owner:'Events/Ops · Marketing · Operations', priority:'High', done:false},
   {id:'t32', month:'May', team:'Events/Ops', initiative:'Muster M025', name:'M025: Audit registrants + group outreach', detail:'Tier 1 + 2 reactivation. CD + Marketing + Ops align on group discount push.', owner:'Marketing + CD + Ops', priority:'Critical', done:false},
   {id:'t33', month:'June', team:'Events/Ops', initiative:'Muster M025', name:'M025: All-channel push — seat count reviews', detail:'Weekly seat count reviews. All-channel push to hit 400. Overflow contingency decision.', owner:'Marketing + CD + Ops', priority:'Critical', done:false},
   {id:'t34', month:'July', team:'Events/Ops', initiative:'Muster M025', name:'M025 EVENT — July 7', detail:'Execute M025. Capture content + attendee data for M026 campaign.', owner:'Ops', priority:'Critical', done:false},
-  {id:'t35', month:'July', team:'Events/Ops', initiative:'Muster M027', name:'Muster 2027: format decision', detail:'Must decide before announcing 2027 dates for sale in August. 3 Musters required in 2027.', owner:'Leadership + Ops', priority:'High', done:false},
-  {id:'t36', month:'August', team:'Events/Ops', initiative:'Muster M026', name:'M026 campaign launches', detail:'Leverage M025 momentum. Announce M027 dates for sale.', owner:'Marketing + CD + Ops', priority:'High', done:false},
+  {id:'t35', month:'June', team:'Events/Ops', initiative:'Muster M027', name:'Muster 2027: format decision', detail:'Must decide before M026 campaign launches in July. 3 Musters required in 2027.', owner:'Leadership + Ops', priority:'High', done:false},
+  {id:'t36', month:'July', team:'Events/Ops', initiative:'Muster M026', name:'M026 campaign launches', detail:'Leverage M025 momentum. Announce M027 dates for sale.', owner:'Marketing + CD + Ops', priority:'High', done:false},
   {id:'t37', month:'October', team:'Events/Ops', initiative:'Muster M026', name:'M026 EVENT', detail:'Execute M026. Track group vs individual ratio.', owner:'Ops', priority:'High', done:false},
   {id:'t38', month:'August', team:'Events/Ops', initiative:'Muster M028', name:'M028: horizon planning', detail:'Decision on dates + location needed EOY. Placeholder — 2028 format TBD.', owner:'Leadership + Ops', priority:'Planned', done:false},
 ];
@@ -221,22 +231,58 @@ const ELT_STREAMS = {
       color: 'var(--cd)', tint: 'var(--cd-tint)',
       goal: 'Hire sales rep · HELIX Project · Evaluate SPIN Selling · Account Management · Client Survey Data + SOP',
       milestones: [
-        {phase:'May', text:'Build HELIX sandbox. Internal team + ops testing. Post JD. Evaluate SPIN Selling trainer. Client Survey Data + SOP kickoff.'},
+        {phase:'May', text:'HELIX sandbox complete. Internal team + ops testing. Post JD. Evaluate SPIN Selling trainer. Client Survey Data + SOP kickoff.'},
         {phase:'June', text:'HELIX: Transition Tier 3 + Tier 4 account data. Sales rep interviews + selection (mid-June decision). Client Survey + SOP rollout.'},
-        {phase:'July', text:'HELIX: Test migrated data + production validation. New sales rep starts Q3.'},
-        {phase:'August', text:'HELIX: Add + train instructors. Case study ROI refinement ongoing.'},
+        {phase:'July', text:'HELIX: Testing + LDAP/Client Alignment Team data validation. Full client reporting live July 31. New sales rep starts Q3.'},
+        {phase:'August', text:'HELIX: Instructor testing + full setup.'},
       ],
       directorItems: [
-        {month:'May', text:'HELIX: Build sandbox + internal team/ops testing', owners:'Client Dev · Ops'},
-        {month:'May', text:'Client Survey Data + SOP — kickoff', owners:'Client Dev · Client Success · LDAP'},
+        {month:'May', text:'HELIX: Sandbox complete + internal team/ops testing', owners:'Client Dev · Ops'},
+        {month:'May', text:'Client Survey Data + SOP — kickoff', owners:'Client Dev · Client Success · LDAP/Client Alignment Team'},
         {month:'June', text:'HELIX: Transition Tier 3 + Tier 4 account data', owners:'Client Dev'},
-        {month:'June', text:'Client Survey Data + SOP — rollout', owners:'Client Dev · Client Success · LDAP'},
-        {month:'July', text:'HELIX: Test migrated data + production validation', owners:'Client Dev · Ops'},
-        {month:'August', text:'HELIX: Add + train instructors', owners:'Client Dev'},
+        {month:'June', text:'Client Survey Data + SOP — rollout', owners:'Client Dev · Client Success · LDAP/Client Alignment Team'},
+        {month:'July', text:'HELIX: Full client reporting live — July 31', owners:'Client Dev · LDAP/Client Alignment Team'},
+        {month:'August', text:'HELIX: Instructor testing + full setup', owners:'Client Dev · LDAP/Client Alignment Team'},
       ]
-    },
+    },,
     {
-      team: 'Marketing',
+      team: 'LDAP/Client Alignment Team',
+      color: 'var(--ldap)', tint: 'var(--ldap-tint)',
+      goal: 'HELIX Project · Client Survey Data + SOP · Account Management',
+      milestones: [
+        {phase:'May', text:'Sandbox access + orientation. Client Survey + SOP kickoff.'},
+        {phase:'June', text:'Validate Tier 3 + Tier 4 migrated data. Client Survey + SOP rollout.'},
+        {phase:'July 31', text:'Full client reporting live in HELIX.'},
+        {phase:'August', text:'Instructor testing + full HELIX setup complete.'},
+      ],
+      directorItems: [
+        {month:'May', text:'HELIX sandbox access + orientation', owners:'LDAP/Client Alignment Team · Client Dev'},
+        {month:'June', text:'Validate Tier 3 + Tier 4 data migration', owners:'LDAP/Client Alignment Team · Client Dev'},
+        {month:'July 31', text:'Full client reporting live in HELIX', owners:'LDAP/Client Alignment Team'},
+        {month:'August', text:'Instructor testing + full setup', owners:'LDAP/Client Alignment Team · Client Dev'},
+      ]
+    },,
+    {
+      team: 'Events/Ops',
+      color: 'var(--ev)', tint: 'var(--ev-tint)',
+      goal: 'Sell out M025 · Execute M026 · Plan M028 · Workshop Pilot',
+      milestones: [
+        {phase:'May', text:'Audit M025 registrants. Align CD on group outreach. Workshop pilot proposal + feasibility decision.'},
+        {phase:'June', text:'All-channel push. Weekly seat count reviews.'},
+        {phase:'July 7', text:'M025 EVENT. Capture content + attendee data.'},
+        {phase:'June', text:'Muster 2027 format decision (must precede July M026 campaign launch).'},
+        {phase:'July', text:'M026 campaign launches. Announce M027 dates.'},
+        {phase:'Oct', text:'M026 EVENT. Track group vs individual ratio.'},
+      ],
+      directorItems: [
+        {month:'May', text:'Workshop pilot: proposal + feasibility decision', owners:'Events/Ops · Marketing · Operations'},
+        {month:'June', text:'Muster 2027 format decision', owners:'Leadership + Ops'},
+        {month:'July', text:'M026 campaign launches + M027 dates announced', owners:'Marketing + CD + Ops'},
+        {month:'Aug–Sep', text:'M028 horizon planning — EOY decision needed', owners:'Leadership + Ops'},
+      ]
+    },,
+    {
+      team: 'Marketing/Media',
       color: 'var(--mkt)', tint: 'var(--mkt-tint)',
       goal: 'Industry Campaigns · Account Management pages · Website rebuild · Workshop Pilot',
       milestones: [
@@ -245,50 +291,31 @@ const ELT_STREAMS = {
         {phase:'Q4', text:'Website rebuild — target Jan 1 launch. Black Friday push. Micro-courses. Workshop pilot planning (if approved).'},
       ],
       directorItems: [
-        {month:'May', text:'Landing page updates — Account Mgmt/LDAP page', owners:'Marketing + Website'},
+        {month:'May', text:'Landing page updates — Account Mgmt/LDAP/Client Alignment Team page', owners:'Marketing + Website'},
         {month:'May', text:'Services pages — leadership levels + problems we solve', owners:'Marketing + Website'},
         {month:'May', text:'Workshop pilot: feasibility decision', owners:'Ops + CD + Leadership'},
         {month:'June 1', text:'All industry campaigns live — Energy/Oil & Gas, Construction, Manufacturing', owners:'Marketing'},
         {month:'Q4', text:'Workshop pilot planning (if approved)', owners:'Marketing + Ops'},
       ]
-    },
+    },,
     {
       team: 'EOA',
       color: 'var(--eoa)', tint: 'var(--eoa-tint)',
       goal: 'Tech stack decision · EO Course launch · Udemy · EOA Academy content',
       milestones: [
-        {phase:'May–July', text:'Tech stack research. Finalize by end of July.'},
+        {phase:'May', text:'Tech stack research complete. Finalize decision by end of May.'},
         {phase:'July–Aug', text:'New EO Course launch + on Udemy.'},
         {phase:'Q4', text:'Record micro-courses.'},
         {phase:'Q1 2027', text:'Record NTL course.'},
       ],
       directorItems: [
-        {month:'July', text:'Finalize tech stack decision', owners:'EOA + Leadership'},
+        {month:'May', text:'Finalize tech stack decision', owners:'EOA + Leadership'},
         {month:'July', text:'EO Course on Udemy: prep + upload', owners:'EOA'},
         {month:'August', text:'New EO Course: live', owners:'EOA + Marketing'},
       ]
-    },
-    {
-      team: 'Events/Ops',
-      color: 'var(--ev)', tint: 'var(--ev-tint)',
-      goal: 'Sell out M025 · Execute M026 · Plan M028',
-      milestones: [
-        {phase:'May', text:'Audit M025 registrants. Align CD on group outreach.'},
-        {phase:'June', text:'All-channel push. Weekly seat count reviews.'},
-        {phase:'July 7', text:'M025 EVENT. Capture content + attendee data.'},
-        {phase:'July', text:'Muster 2027 format decision (must precede August sales announcement).'},
-        {phase:'August', text:'M026 campaign launches. Announce M027 dates.'},
-        {phase:'Oct', text:'M026 EVENT. Track group vs individual ratio.'},
-      ],
-      directorItems: [
-        {month:'July', text:'Muster 2027 format decision', owners:'Leadership + Ops'},
-        {month:'August', text:'Announce M027 dates for sale', owners:'Marketing + Ops'},
-        {month:'Aug–Sep', text:'M028 horizon planning — EOY decision needed', owners:'Leadership + Ops'},
-      ]
-    },
+    },,
   ]
 };
-
 // ── SHARED PERSISTENT STORAGE ──
 let state = {
   tasks: DEFAULT_TASKS.map(t=>({...t})),
@@ -399,6 +426,7 @@ function teamBadgeClass(team) {
   if (!team) return 'badge-team-other';
   const t = team.toLowerCase();
   if (t.includes('client dev')) return 'badge-team-cd';
+  if (t.includes('ldap')) return 'badge-team-ldap';
   if (t.includes('marketing')) return 'badge-team-mkt';
   if (t.includes('operations')) return 'badge-team-ops';
   if (t.includes('eoa')) return 'badge-team-eoa';
@@ -479,7 +507,7 @@ function renderElt() {
     });
     html += `</div><div class="elt-progress"><div class="elt-progress-label"><span>Progress</span><span>${done}/${teamTasks.length} tasks</span></div><div class="elt-progress-bar"><div class="elt-progress-fill" style="width:${pct}%;background:${barColor}"></div></div></div>`;
     if (s.directorItems && s.directorItems.length > 0) {
-      html += `<div class="elt-directors"><div class="elt-directors-label">Director Action Items</div><div class="elt-action-items">`;
+      html += `<div class="elt-directors"><div class="elt-directors-label">Action Items</div><div class="elt-action-items">`;
       s.directorItems.forEach(item => {
         html += `<div class="elt-action"><div class="elt-action-month">${esc(item.month)}</div><div><div class="elt-action-text">${esc(item.text)}</div><div class="elt-action-owners">${esc(item.owners)}</div></div></div>`;
       });
